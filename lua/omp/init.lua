@@ -49,6 +49,15 @@ local function float_config()
   }
 end
 
+vim.api.nvim_create_autocmd('VimResized', {
+  callback = function()
+    if valid_win() then
+      vim.api.nvim_win_set_config(state.win, float_config())
+    end
+  end,
+  desc = 'Resize OMP floating terminal',
+})
+
 local function style_float()
   if not valid_win() then return end
 

@@ -18,7 +18,7 @@ vim.pack.add { 'https://github.com/james-yap/omp.nvim' }
 
 require('omp').setup {
   keymaps = {
-    open = '<leader>oa',
+    open = 'gm',
     hide = '<C-q>',
   },
 }
@@ -34,7 +34,7 @@ require('omp').setup {
   config = function()
     require('omp').setup {
       keymaps = {
-        open = '<leader>oa',
+        open = 'gm',
         hide = '<C-q>',
       },
     }
