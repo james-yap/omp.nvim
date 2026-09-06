@@ -5,6 +5,8 @@ local defaults = {
   keymaps = {
     open = nil,
     hide = nil,
+    copy_path = 'gP',
+    copy_path_with_position = 'gp',
   },
   window = {
     width = 0.9,
@@ -96,6 +98,47 @@ local function clear_state()
   state.terminal_normal = false
 end
 
+local function path_with_position()
+  local path = vim.fn.expand '%:p'
+  local mode = vim.fn.mode()
+
+  if mode == 'v' or mode == 'V' or mode == '\22' then
+    local start_pos = vim.fn.getpos 'v'
+    local end_pos = vim.fn.getpos '.'
+    local start_row, start_col = start_pos[2], start_pos[3]
+    local end_row, end_col = end_pos[2], end_pos[3]
+
+    -- Normalize so the start position precedes the end position.
+    if start_row > end_row or (start_row == end_row and start_col > end_col) then
+      start_row, start_col, end_row, end_col = end_row, end_col, start_row, start_col
+    end
+
+    if mode == 'V' then
+      return string.format('%s:L%d-L%d', path, start_row, end_row)
+    elseif start_row == end_row then
+      return string.format('%s:L%d:C%d-C%d', path, start_row, start_col, end_col)
+    end
+    return string.format('%s:L%d:C%d-L%d:C%d', path, start_row, start_col, end_row, end_col)
+  end
+
+  local cursor = vim.fn.getpos '.'
+  return string.format('%s:L%d:C%d', path, cursor[2], cursor[3])
+end
+
+function M.copy_path_with_position()
+  local result = path_with_position()
+  vim.fn.setreg('+', result)
+  vim.notify('Copied path+position to clipboard', vim.log.levels.INFO)
+  return result
+end
+
+function M.copy_path()
+  local path = vim.fn.expand '%:p'
+  vim.fn.setreg('+', path)
+  vim.notify('Copied file path to clipboard', vim.log.levels.INFO)
+  return path
+end
+
 function M.open()
   if valid_win() then
     vim.api.nvim_set_current_win(state.win)
@@ -161,6 +204,18 @@ function M.setup(opts)
   if config.keymaps.open then
     vim.keymap.set('n', config.keymaps.open, M.open, {
       desc = 'OMP floating terminal',
+    })
+  end
+
+  if config.keymaps.copy_path then
+    vim.keymap.set('n', config.keymaps.copy_path, M.copy_path, {
+      desc = 'Copy current file path',
+    })
+  end
+
+  if config.keymaps.copy_path_with_position then
+    vim.keymap.set({ 'n', 'x' }, config.keymaps.copy_path_with_position, M.copy_path_with_position, {
+      desc = 'Copy file path with range or position',
     })
   end
 end

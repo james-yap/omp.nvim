@@ -23,6 +23,9 @@ local first_win = vim.api.nvim_get_current_win()
 local win_config = vim.api.nvim_win_get_config(first_win)
 assert(win_config.relative == 'editor', 'OMP did not open in an editor-relative float')
 assert(vim.fn.maparg('<leader>ma', 'n') ~= '', 'open keymap was not installed')
+assert(vim.fn.maparg('gp', 'n') ~= '', 'gp keymap was not installed')
+assert(vim.fn.maparg('gp', 'x') ~= '', 'gp visual keymap was not installed')
+assert(vim.fn.maparg('gP', 'n') ~= '', 'gP keymap was not installed')
 assert(vim.fn.maparg('<C-q>', 't') ~= '', 'hide keymap was not installed')
 
 vim.o.columns = vim.o.columns - 10

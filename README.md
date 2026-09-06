@@ -2,8 +2,6 @@
 
 A small Neovim plugin that runs [Oh My Pi](https://github.com/can1357/oh-my-pi) in a persistent floating terminal.
 
-The terminal session survives when its window is hidden. Reopening it restores terminal-normal mode and the saved view when applicable; otherwise it returns to terminal-input mode. The session is removed when OMP exits.
-
 ## Requirements
 
 - Neovim 0.11 or newer
@@ -11,47 +9,20 @@ The terminal session survives when its window is hidden. Reopening it restores t
 
 ## Installation
 
+`width` and `height` are fractions of Neovim's current dimensions. The command starts in Neovim's current working directory. `COLORFGBG` is set from the current `background` option so nested terminal colors remain consistent.
+
 ### `vim.pack`
 
 ```lua
 vim.pack.add { 'https://github.com/james-yap/omp.nvim' }
 
 require('omp').setup {
-  keymaps = {
-    open = 'gm',
-    hide = '<C-q>',
-  },
-}
-```
-
-`open` is a normal-mode global keymap. `hide` is buffer-local to the OMP terminal and works in normal and terminal modes. Both are disabled by default so the plugin does not claim keys unless configured.
-
-### lazy.nvim
-
-```lua
-{
-  'james-yap/omp.nvim',
-  config = function()
-    require('omp').setup {
-      keymaps = {
-        open = 'gm',
-        hide = '<C-q>',
-      },
-    }
-  end,
-}
-```
-
-## Configuration
-
-The defaults are:
-
-```lua
-require('omp').setup {
   command = { 'omp' },
   keymaps = {
     open = nil,
     hide = nil,
+    copy_path = 'gP',
+    copy_path_with_position = 'gp',
   },
   window = {
     width = 0.9,
@@ -63,7 +34,48 @@ require('omp').setup {
 }
 ```
 
-`width` and `height` are fractions of Neovim's current dimensions. The command starts in Neovim's current working directory. `COLORFGBG` is set from the current `background` option so nested terminal colors remain consistent.
+### lazy.nvim
+
+```lua
+{
+  'james-yap/omp.nvim',
+  config = function()
+    require('omp').setup {
+      command = { 'omp' },
+      keymaps = {
+        open = nil,
+        hide = nil,
+        copy_path = 'gP',
+        copy_path_with_position = 'gp',
+      },
+      window = {
+        width = 0.9,
+        height = 0.85,
+        border = 'rounded',
+        title = ' OMP ',
+        title_pos = 'center',
+      },
+    }
+  end,
+}
+```
+
+## Default keymaps
+
+| Keys | Mode | What it does |
+| --- | --- | --- |
+| `gp` | normal, visual | Copy the absolute file path plus cursor position or visual range to the clipboard (`+` register) |
+| `gP` | normal | Copy only the absolute file path to the clipboard |
+| `<C-\><C-n>` | terminal | Escape into a visual-like mode in the terminal buffer. Neovim builtin; see `:help terminal-input` |
+
+`gp` and `gP` override Vim's built-in put-and-leave-cursor-after mappings. Set `copy_path` or `copy_path_with_position` to `false` to keep the Vim defaults.
+
+Clipboard strings use this format so you can paste them into OMP:
+
+- Cursor: `/abs/path/file.lua:L12:C4`
+- Linewise visual (`V`): `/abs/path/file.lua:L3-L10`
+- Character visual, one line: `/abs/path/file.lua:L12:C4-C20`
+- Character or block visual, many lines: `/abs/path/file.lua:L3:C1-L10:C8`
 
 ## Commands
 
@@ -82,6 +94,8 @@ local omp = require 'omp'
 omp.open()
 omp.hide()
 omp.toggle()
+omp.copy_path()                 -- absolute path
+omp.copy_path_with_position()   -- path plus :L / :C range
 ```
 
 ## License
