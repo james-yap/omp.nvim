@@ -3,8 +3,8 @@ local M = {}
 local defaults = {
   command = { 'omp' },
   keymaps = {
-    open = nil,
-    hide = nil,
+    open = 'gm',
+    hide = '<C-q>',
     copy_path = 'gP',
     copy_path_with_position = 'gp',
   },

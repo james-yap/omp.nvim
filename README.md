@@ -19,8 +19,8 @@ vim.pack.add { 'https://github.com/james-yap/omp.nvim' }
 require('omp').setup {
   command = { 'omp' },
   keymaps = {
-    open = nil,
-    hide = nil,
+    open = 'gm',
+    hide = '<C-q>',
     copy_path = 'gP',
     copy_path_with_position = 'gp',
   },
@@ -43,8 +43,8 @@ require('omp').setup {
     require('omp').setup {
       command = { 'omp' },
       keymaps = {
-        open = nil,
-        hide = nil,
+        open = 'gm',
+        hide = '<C-q>',
         copy_path = 'gP',
         copy_path_with_position = 'gp',
       },
@@ -64,11 +64,13 @@ require('omp').setup {
 
 | Keys | Mode | What it does |
 | --- | --- | --- |
+| `gm` | normal | Open or focus the OMP float |
+| `<C-q>` | normal and terminal, buffer-local | Hide the float without stopping OMP |
 | `gp` | normal, visual | Copy the absolute file path plus cursor position or visual range to the clipboard (`+` register) |
 | `gP` | normal | Copy only the absolute file path to the clipboard |
 | `<C-\><C-n>` | terminal | Escape into a visual-like mode in the terminal buffer. Neovim builtin; see `:help terminal-input` |
 
-`gp` and `gP` override Vim's built-in put-and-leave-cursor-after mappings. Set `copy_path` or `copy_path_with_position` to `false` to keep the Vim defaults.
+`gp` and `gP` override Vim's built-in put-and-leave-cursor-after mappings. Set any keymap option to `false` to disable it.
 
 Clipboard strings use this format so you can paste them into OMP:
 

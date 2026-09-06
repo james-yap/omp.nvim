@@ -14,6 +14,7 @@ assert(vim.fn.maparg('gP', 'n') == '', 'copy_path=false left gP mapped')
 
 require('omp').setup {}
 assert(vim.fn.maparg('gp', 'n') ~= '', 'default gp keymap was not installed')
+assert(vim.fn.maparg('gm', 'n') ~= '', 'default gm keymap was not installed')
 assert(vim.fn.maparg('gP', 'n') ~= '', 'default gP keymap was not installed')
 
 local omp = require 'omp'
