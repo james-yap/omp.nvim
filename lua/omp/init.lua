@@ -128,6 +128,7 @@ end
 function M.copy_path_with_position()
   local result = path_with_position()
   vim.fn.setreg('+', result)
+  vim.cmd('normal! \27')
   vim.notify('Copied path+position to clipboard', vim.log.levels.INFO)
   return result
 end
