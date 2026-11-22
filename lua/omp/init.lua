@@ -98,6 +98,27 @@ local function clear_state()
   state.terminal_normal = false
 end
 
+-- Kitty graphics delete-all (`d=a`/`d=A`) would also wipe images other plugins draw.
+local function is_kitty_delete_all(control)
+  local is_delete, target = false, nil
+  for key, value in control:gmatch '(%a)=([^,]*)' do
+    if key == 'a' then is_delete = value == 'd' end
+    if key == 'd' then target = value end
+  end
+  -- A bare `a=d` defaults to deleting every placement.
+  return is_delete and (target == nil or target == 'a' or target == 'A')
+end
+
+-- Neovim's :terminal swallows APC sequences, so forward Kitty graphics to the
+-- host terminal. OMP draws them with Unicode placeholders, which are ordinary
+-- text cells and therefore survive Neovim's grid.
+function M.forward_kitty_graphics(sequence, terminator)
+  if not vim.api.nvim_ui_send or sequence:sub(1, 3) ~= '\27_G' then return false end
+  if is_kitty_delete_all(sequence:sub(4):match '^[^;]*') then return false end
+  vim.api.nvim_ui_send(sequence .. terminator)
+  return true
+end
+
 local function path_with_position()
   local path = vim.fn.expand '%:p'
   local mode = vim.fn.mode()
@@ -158,6 +179,11 @@ function M.open()
   vim.bo[state.buf].bufhidden = 'hide'
   state.win = vim.api.nvim_open_win(state.buf, true, float_config())
   style_float()
+  vim.api.nvim_create_autocmd('TermRequest', {
+    buffer = state.buf,
+    callback = function(args) M.forward_kitty_graphics(args.data.sequence, args.data.terminator) end,
+    desc = 'Forward OMP Kitty graphics to the host terminal',
+  })
 
   local colorfgbg = vim.o.background == 'light' and '0;15' or '15;0'
   local buf = state.buf
