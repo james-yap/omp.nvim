@@ -11,6 +11,8 @@ A small Neovim plugin that runs [Oh My Pi](https://github.com/can1357/oh-my-pi) 
 
 `width` and `height` are fractions of Neovim's current dimensions. The command starts in Neovim's current working directory. `COLORFGBG` is set from the current `background` option so nested terminal colors remain consistent.
 
+On Neovim 0.12 or newer, Kitty graphics from OMP are forwarded to the host terminal, so images render inside the float on terminals that support Kitty Unicode placeholders (Kitty, Ghostty). Kitty delete-all commands are dropped so OMP cannot clear images drawn by other plugins.
+
 ### `vim.pack`
 
 ```lua
